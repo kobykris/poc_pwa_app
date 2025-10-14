@@ -181,7 +181,7 @@ const PWATest = () => {
       </div>
       
       <div className='py-5'>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             className='bg-cyan-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-cyan-700 disabled:bg-cyan-300 transition-colors duration-200'
             onClick={handleSubscribe}
