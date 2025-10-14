@@ -35,3 +35,10 @@ self.addEventListener('notificationclick', (event) => {
   // event.waitUntil(clients.openWindow('/some-url'));
 });
 
+self.addEventListener('message', (event) => {
+  console.log('[SW] Message detected.', event.data);
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    // activate new version of service worker
+    self.skipWaiting();
+  }
+});

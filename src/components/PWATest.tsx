@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { urlBase64ToUint8Array } from '../utils'
+import ReloadPrompt from './ReloadPrompt';
 
 const PWATest = () => {
   const [publicKey, setPublicKey] = useState<string | null>(null);
@@ -224,7 +225,7 @@ const PWATest = () => {
         </pre>
       </div>
 
-      
+      <ReloadPrompt />
 
     </div>
   )
