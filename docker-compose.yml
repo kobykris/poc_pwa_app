@@ -1,0 +1,16 @@
+services:
+  pwa_app:
+    build:
+      context: .
+      dockerfile: .docker/node/Dockerfile.dev
+    tty: true
+    volumes:
+      - ./:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+      - pnpm_store:/usr/src/app/.pnpm-store
+    ports:
+      - "${HOST_PORT}:${PORT}"
+
+volumes:
+  node_modules:
+  pnpm_store:
