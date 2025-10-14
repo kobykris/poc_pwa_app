@@ -6,9 +6,21 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "vscode-icons-team.vscode-icons",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "dsznajder.es7-react-js-snippets",
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "naumovs.color-highlight",
+        "anseki.vscode-color",
+        "ms-azuretools.vscode-containers",
+        "mikestead.dotenv",
+        "vincaslt.highlight-matching-tag",
+        "ecmel.vscode-html-css",
+        "xabikos.javascriptsnippets",
+        "ms-vscode.vscode-typescript-next"
       ],
       "settings": {
         "typescript.tsdk": "node_modules/typescript/lib"
