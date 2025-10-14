@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
+import { urlBase64ToUint8Array } from '../utils'
 
 const PWATest = () => {
-    const [isSubscribed, setIsSubscribed] = useState(false);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
+  const baseUrl = import.meta.env.VITE_API_URL
+
+  // Check if the user is already subscribed
   const checkSubscription = async () => {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready
@@ -13,6 +18,20 @@ const PWATest = () => {
     }
   }
 
+  const getPublicKey = async () => {
+    const response = await fetch(`${baseUrl}/vapid-public-key`)
+    const { publicKey } = await response.json()
+    return publicKey
+  }
+
+  const handleCheckPublicKey = async () => {
+    try {
+      const publicKey = await getPublicKey()
+      setPublicKey(publicKey)
+    } catch (error) {
+      console.error('Error fetching public key:', error)
+    }
+  }
   const handleSubscribe = async () => {
     if (!('serviceWorker' in navigator)) {
       alert('Service Worker is not supported in this browser.')
@@ -25,19 +44,45 @@ const PWATest = () => {
     }
 
     console.log('Registering service worker...')
+    try {
+      const registration = await navigator.serviceWorker.ready
+      console.log('Service Worker registered:', registration)
 
+    } catch (error) {
+      console.error('Service Worker registration failed:', error)
+      return
+    }
     
   }
 
   useEffect(() => {
-    console.log({navigator, window})
+    // console.log({navigator, window})
     checkSubscription()
   }, [])
 
   return (
-    <div className='flex flex-col h-screen bg-gray-100 items-center justify-center'>
+    <div className='p-10'>
 
-      <h1 className='text-5xl font-bold p-5'>PWA POC</h1>
+      <h1 className='text-5xl font-bold'>PWA POC DEBUGGER</h1>
+      
+      <div className='py-5'>
+        <button 
+          className='bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-700 disabled:bg-orange-300 transition-colors duration-200' 
+          onClick={handleCheckPublicKey}
+          disabled={publicKey !== null}
+        >
+          Get Public Key
+        </button>
+
+        <pre className='py-5 break-words whitespace-pre-wrap max-full overflow-auto max-h-100'>
+          {
+            JSON.stringify({ 
+              publicKey: publicKey,
+              Uint8Array: publicKey ? urlBase64ToUint8Array(publicKey) : null
+            }, null, 2)
+          }
+        </pre>
+      </div>
       
       <div className='py-5'>
         <button 
@@ -47,11 +92,18 @@ const PWATest = () => {
         >
           {isSubscribed ? 'Subscribed' : 'Subscribe'}
         </button>
+
+        <pre className='py-5 break-words whitespace-pre-wrap max-full overflow-auto max-h-100'>
+          {
+            JSON.stringify({ 
+              is: isSubscribed, 
+              data: null 
+            }, null, 2)
+          }
+        </pre>
       </div>
 
-      <pre className='py-5'>
-        {isSubscribed ? JSON.stringify({ is: isSubscribed, data: null }, null, 2) : 'No data yet'}
-      </pre>
+      
 
     </div>
   )
