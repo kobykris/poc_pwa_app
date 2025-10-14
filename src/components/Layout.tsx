@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
         <div className="flex items-center gap-2">
            {/* ใส่ Logo ของคุณที่นี่ */}
           <img src="/favicon.ico" className="h-8 w-8" alt="App Logo" />
-          <span className="text-xl font-bold text-gray-800">PWA PoC</span>
+          <span className="text-xl font-bold text-gray-800">PWA</span>
         </div>
         <div className="w-10"></div> {/* Spacer */}
       </header>
