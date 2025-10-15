@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .pnpm-store
+dev-dist
+/build
 
 # Editor directories and files
 .vscode/*
