@@ -1,15 +1,17 @@
 // src/pages/HomePage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { BellRing, Vibrate, VibrateOff } from 'lucide-react';
+import { BellRing, Vibrate, VibrateOff, LoaderCircle } from 'lucide-react';
 import * as $sw from '../utils/service-worker'
 import type { SubscriptionStatus } from "../services/subscription.service";
 import { statusProps, getPublicKey, postSubscription, postUnsubscription } from "../services/subscription.service";
 
 const HomePage: React.FC = () => {
   const [notificationStatus, setNotificationStatus] = useState<SubscriptionStatus>('PENDING');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Check subscription status
   const checkSubscription = async () => {
+    setIsLoading(true);
     try {
       const subscription = await $sw.pushManagerGetSubscription()
       if (subscription) {
@@ -24,10 +26,13 @@ const HomePage: React.FC = () => {
           setNotificationStatus('UNSUPPORTED');
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleSubscribe = async () => {
+    setIsLoading(true);
     try {
       const publicKey = await getPublicKey()
       if ( !publicKey ) throw new Error('No public key available')
@@ -52,10 +57,13 @@ const HomePage: React.FC = () => {
           alert(`An error occurred while subscribing: ${error.message}. Please try again.`);
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleUnsubscribe = async () => {
+    setIsLoading(true);
     try {
       const subscription = await $sw.pushManagerGetSubscription()
       if ( !subscription ) throw new Error('No subscription available')
@@ -84,6 +92,8 @@ const HomePage: React.FC = () => {
           alert(`An error occurred while subscribing: ${error.message}. Please try again.`);
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -116,7 +126,7 @@ const HomePage: React.FC = () => {
         <span 
           className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${statusClass}`}
         >
-          {statusMessage}
+          {isLoading ? <LoaderCircle size={20} className="animate-spin" /> : statusMessage}
         </span>
 
       </div>
@@ -126,18 +136,22 @@ const HomePage: React.FC = () => {
         {isSubscribed && (
           <button
             onClick={handleUnsubscribe}
+            disabled={isLoading}
             className="flex justify-center gap-3 items-center w-full max-w-xs px-4 py-2 font-semibold text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors"
           >
-            <VibrateOff size={30} /> ยกเลิกการแจ้งเตือน
+            {isLoading ? <LoaderCircle size={30} className="animate-spin" /> : <VibrateOff size={30} />}
+            {isLoading ? 'กำลังดำเนินการ...' : 'ยกเลิกการแจ้งเตือน'}
           </button>
         )}
 
         {isUnsubscribed && (
           <button
             onClick={handleSubscribe}
+            disabled={isLoading}
             className="flex justify-center gap-3 items-center w-full max-w-xs px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors"
           >
-            <Vibrate size={30} /> รับการแจ้งเตือน
+            {isLoading ? <LoaderCircle size={30} className="animate-spin" /> : <Vibrate size={30} />}
+            {isLoading ? 'กำลังดำเนินการ...' : 'รับการแจ้งเตือน'}
           </button>
         )}
 
