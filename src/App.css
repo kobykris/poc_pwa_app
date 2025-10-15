@@ -8,25 +8,4 @@
   [role="button"]:disabled {
     cursor: not-allowed;
   }
-
-  .pwa-toast {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    padding: 12px;
-    border: 1px solid #888;
-    border-radius: 4px;
-    z-index: 1000;
-    text-align: left;
-    box-shadow: 3px 4px 5px 0 #888;
-    background-color: white;
-    color: black;
-  }
-  .pwa-toast button {
-    border: 1px solid #888;
-    outline: none;
-    margin-left: 5px;
-    border-radius: 2px;
-    padding: 3px 10px;
-  }
 }
