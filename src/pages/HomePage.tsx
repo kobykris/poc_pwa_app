@@ -1,20 +1,102 @@
 // src/pages/HomePage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BellRing, Vibrate, VibrateOff } from 'lucide-react';
+import * as $sw from '../utils/service-worker'
+import type { SubscriptionStatus } from "../services/subscription.service";
+import { statusProps, getPublicKey, postSubscription, postUnsubscription } from "../services/subscription.service";
 
-// คุณสามารถย้าย Logic การ subscribe/unsubscribe มาไว้ที่นี่
-// หรือสร้างเป็น Custom Hook เพื่อใช้ซ้ำได้
 const HomePage: React.FC = () => {
-  // สมมติว่ามี state และ function เหล่านี้
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const handleSubscribe = () => console.log('Subscribe clicked');
-  const handleUnsubscribe = () => console.log('Unsubscribe clicked');
+  const [notificationStatus, setNotificationStatus] = useState<SubscriptionStatus>('PENDING');
 
-  // ใส่ Logic การ check subscription จริงๆ ที่นี่
-  useEffect(() => {
-    // ... check with registration.pushManager.getSubscription() ...
-    setIsSubscribed(true)
+  // Check subscription status
+  const checkSubscription = async () => {
+    try {
+      const subscription = await $sw.pushManagerGetSubscription()
+      if (subscription) {
+        setNotificationStatus('SUBSCRIBED');
+      } else {
+        setNotificationStatus('UNSUBSCRIBED');
+      }
+    } catch (error: unknown) {
+      console.error('[ERR] checking subscription failed:', error);
+      if (error instanceof Error) {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+          setNotificationStatus('UNSUPPORTED');
+        }
+      }
+    }
+  }
+
+  const handleSubscribe = async () => {
+    try {
+      const publicKey = await getPublicKey()
+      if ( !publicKey ) throw new Error('No public key available')
+
+      const subscription = await $sw.pushManagerSubscribe(publicKey)
+      if ( !subscription ) throw new Error('No subscription available')
+
+      const { success, message } = await postSubscription(subscription)
+      if ( !success ) throw new Error(message)
+      setNotificationStatus('SUBSCRIBED');
+
+    } catch (error: unknown) {
+      console.error('[ERR] subscribing failed:', error);
+      if (error instanceof Error) {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+          setNotificationStatus('UNSUPPORTED');
+        }
+
+        if ( error.name === 'NetworkError' ) {
+          alert('Subscription failed due to a network error. Please try again when you are online.');
+        } else {
+          alert(`An error occurred while subscribing: ${error.message}. Please try again.`);
+        }
+      }
+    }
+  }
+
+  const handleUnsubscribe = async () => {
+    try {
+      const subscription = await $sw.pushManagerGetSubscription()
+      if ( !subscription ) throw new Error('No subscription available')
+      const { endpoint } = subscription
+      if ( !endpoint ) throw new Error('No endpoint available')
+
+      // Unsubscribe from push service
+      const resp = await subscription.unsubscribe()
+      if ( !resp ) throw new Error('Unsubscribe push service failed')
+
+      // Unsubscribe from notification server
+      const { success, message } = await postUnsubscription(endpoint)
+      if ( !success ) throw new Error(message)
+      setNotificationStatus('UNSUBSCRIBED');
+
+    } catch (error: unknown) {
+      console.error('[ERR] subscribing failed:', error);
+      if (error instanceof Error) {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+          setNotificationStatus('UNSUPPORTED');
+        }
+
+        if ( error.name === 'NetworkError' ) {
+          alert('Subscription failed due to a network error. Please try again when you are online.');
+        } else {
+          alert(`An error occurred while subscribing: ${error.message}. Please try again.`);
+        }
+      }
+    }
+  }
+
+  
+  useEffect( () => {
+    checkSubscription()
   }, []);
+
+  const isSubscribed = useMemo(() => notificationStatus === 'SUBSCRIBED', [notificationStatus]);
+  const isUnsubscribed = useMemo(() => notificationStatus === 'UNSUBSCRIBED', [notificationStatus]);
+  const statusMessage = useMemo(() => statusProps[notificationStatus].text || '', [notificationStatus]);
+  const statusClass = useMemo(() => statusProps[notificationStatus].class || '', [notificationStatus]);
+  // const isUnsupported = useMemo(() => notificationStatus === 'UNSUPPORTED', [notificationStatus]);
 
   return (
     <div className="text-center p-4 bg-white rounded-lg shadow-md py-10">
@@ -32,22 +114,25 @@ const HomePage: React.FC = () => {
         <p className="text-gray-700 font-bold">สถานะ:</p>
 
         <span 
-          className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${isSubscribed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+          className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${statusClass}`}
         >
-          {isSubscribed ? 'รับแจ้งเตือน' : 'ไม่รับแจ้งเตือน'}
+          {statusMessage}
         </span>
 
       </div>
 
       <div className="flex flex-col items-center gap-4 my-3">
-        {isSubscribed ? (
+
+        {isSubscribed && (
           <button
             onClick={handleUnsubscribe}
             className="flex justify-center gap-3 items-center w-full max-w-xs px-4 py-2 font-semibold text-white bg-red-500 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors"
           >
             <VibrateOff size={30} /> ยกเลิกการแจ้งเตือน
           </button>
-        ) : (
+        )}
+
+        {isUnsubscribed && (
           <button
             onClick={handleSubscribe}
             className="flex justify-center gap-3 items-center w-full max-w-xs px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors"
@@ -55,6 +140,7 @@ const HomePage: React.FC = () => {
             <Vibrate size={30} /> รับการแจ้งเตือน
           </button>
         )}
+
       </div>
     </div>
   );
