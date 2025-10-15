@@ -1,6 +1,6 @@
 // src/components/Layout.tsx
 import React, { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react'; // ไอคอน Hamburger และ X
 
 const Layout: React.FC = () => {
@@ -25,8 +25,10 @@ const Layout: React.FC = () => {
         </button>
         <div className="flex items-center gap-2">
            {/* ใส่ Logo ของคุณที่นี่ */}
-          <img src="/favicon.ico" className="h-8 w-8" alt="App Logo" />
-          <span className="text-xl font-bold text-gray-800">PWA</span>
+          <Link to="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
+            <img src="/favicon.ico" className="h-8 w-8" alt="App Logo" />
+            <span className="text-xl font-bold text-gray-800">PWA</span>
+          </Link>
         </div>
         <div className="w-10"></div> {/* Spacer */}
       </header>

@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
 
       <p className="text-gray-600 mb-6">ทดสอบการรับแจ้งเตือนผ่าน Push Notification</p>
 
-      <div className='flex justify-between p-5'>
+      <div className='flex justify-between sm:justify-center sm:gap-30 p-5'>
 
         <p className="text-gray-700 font-bold">สถานะ:</p>
 
