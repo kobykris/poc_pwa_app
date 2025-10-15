@@ -22,6 +22,55 @@ export default defineConfig(() => {
         includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
 
         workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'google-fonts-stylesheets',
+              },
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-webfonts',
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+                expiration: {
+                  maxEntries: 30,
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+                },
+              },
+            },
+            {
+              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'image-cache',
+                expiration: {
+                  maxEntries: 60,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+              },
+            },
+            {
+              urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24, // 1 day
+                },
+                cacheableResponse: {
+                  statuses: [200],
+                },
+              },
+            },
+          ],
+
           globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
 
           globIgnores: ["**/node_modules/**", "**/dev-dist/**"],
