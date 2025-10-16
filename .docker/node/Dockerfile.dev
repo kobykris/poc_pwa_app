@@ -3,7 +3,7 @@ RUN apk add --no-cache git
 RUN corepack enable
 WORKDIR /usr/src/app
 
-COPY package*.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm config set store-dir .pnpm-store
 
