@@ -9,7 +9,7 @@ services:
       - node_modules:/usr/src/app/node_modules
       - pnpm_store:/usr/src/app/.pnpm-store
     ports:
-      - "${HOST_PORT}:${PORT}"
+      - "${HOST_PORT}:3000"
 
 volumes:
   node_modules:
