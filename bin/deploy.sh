@@ -32,7 +32,7 @@ deploy_prod() {
     # Deploy with docker compose
     docker compose \
         -f docker-compose.prod.yml \
-        --env-file .env.production \
+        --env-file ./.env.production \
         up -d --build
     
     log_info "Production environment is running"
@@ -42,6 +42,7 @@ down_services() {
     log_info "Stopping production services..."
     docker compose \
         -f docker-compose.prod.yml \
+        --env-file ./.env.production \
         down
 }
 
@@ -49,6 +50,7 @@ down_rmi_services() {
     log_info "Stopping production services..."
     docker compose \
         -f docker-compose.prod.yml \
+        --env-file ./.env.production \
         down --rmi local
 }
 
@@ -56,18 +58,21 @@ restart_services() {
     log_info "Restarting services..."
     docker compose \
         -f docker-compose.prod.yml \
+        --env-file ./.env.production \
         restart
 }
 
 show_status() {
     docker compose \
         -f docker-compose.prod.yml \
+        --env-file ./.env.production \
         ps
 }
 
 show_logs() {
     docker compose \
         -f docker-compose.prod.yml \
+        --env-file ./.env.production \
         logs -f
 }
 
