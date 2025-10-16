@@ -29,3 +29,7 @@ dev-dist
 .env
 .env.local
 .env.production
+
+# Config
+config/*/*
+!config/*/nginx.conf.example
