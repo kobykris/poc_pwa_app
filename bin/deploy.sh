@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # PWA App Deployment Script
-# Usage: ./deploy.sh [deploy|restart|logs|status|down|remove]
+# Usage: ./deploy.sh [up|restart|logs|ps|down|remove]
 
 # Colors for output
 RED='\033[0;31m'
@@ -11,7 +11,7 @@ NC='\033[0m'
 
 # Configuration
 APP_NAME="pwa"
-ACTION=${1:-status}
+ACTION=${1:-ps}
 
 # Functions
 log_info() {
@@ -46,12 +46,12 @@ down_services() {
         down
 }
 
-down_rmi_services() {
+remove_services() {
     log_info "Stopping production services..."
     docker compose \
         -f docker-compose.prod.yml \
         --env-file ./.env.production \
-        down --rmi local
+        down -v --rmi local
 }
 
 restart_services() {
@@ -76,12 +76,12 @@ show_logs() {
         logs -f
 }
 
-log_info "PWA App Deployment Script [deploy|restart|logs|status|down|remove]"
+log_info "PWA App Deployment Script [up|restart|logs|ps|down|remove]"
 log_info "Action: $ACTION"
 echo ""
 
 case $ACTION in
-    deploy)
+    up)
         deploy_prod
         ;;
     restart)
@@ -90,14 +90,14 @@ case $ACTION in
     logs)
         show_logs
         ;;
-    status)
+    ps)
         show_status
         ;;
     down)
         down_services
         ;;
     remove)
-        down_rmi_services
+        remove_services
         ;;
 esac
 
