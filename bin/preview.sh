@@ -53,7 +53,7 @@ run_app() {
     preview_app
 }
 
-log_info "PWA App Preview Script [run|build|serve]"
+log_info "PWA App Preview Development Script [run|build|serve]"
 log_info "Action: $ACTION"
 echo ""
 
