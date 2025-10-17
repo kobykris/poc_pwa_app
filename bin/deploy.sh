@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# PWA App Deployment Script
+# PWA Deployment Script
 # Usage: ./deploy.sh [up|restart|logs|ps|down|remove]
 
 # Colors for output
@@ -12,6 +12,7 @@ NC='\033[0m'
 # Configuration
 APP_NAME="pwa"
 ACTION=${1:-ps}
+EXTRA_ARGS="${@:2}"
 
 # Functions
 log_info() {
@@ -43,7 +44,7 @@ down_services() {
     docker compose \
         -f docker-compose.prod.yml \
         --env-file ./.env.production \
-        down
+        down $EXTRA_ARGS
 }
 
 remove_services() {
@@ -59,24 +60,24 @@ restart_services() {
     docker compose \
         -f docker-compose.prod.yml \
         --env-file ./.env.production \
-        restart
+        restart $EXTRA_ARGS
 }
 
 show_status() {
     docker compose \
         -f docker-compose.prod.yml \
         --env-file ./.env.production \
-        ps
+        ps $EXTRA_ARGS
 }
 
 show_logs() {
     docker compose \
         -f docker-compose.prod.yml \
         --env-file ./.env.production \
-        logs -f
+        logs -f $EXTRA_ARGS
 }
 
-log_info "PWA App Deployment Script [up|restart|logs|ps|down|remove]"
+log_info "PWA Deployment Script [up|restart|logs|ps|down|remove]"
 log_info "Action: $ACTION"
 echo ""
 
