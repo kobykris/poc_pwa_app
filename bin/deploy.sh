@@ -76,7 +76,7 @@ show_logs() {
         logs -f
 }
 
-log_info "PWA App Deployment Script"
+log_info "PWA App Deployment Script [deploy|restart|logs|status|down|remove]"
 log_info "Action: $ACTION"
 echo ""
 
