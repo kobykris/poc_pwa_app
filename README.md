@@ -1,103 +1,117 @@
-# PWA Push Notification PoC
+# PWA Push Notification
+
 A Proof of Concept (PoC) project demonstrating Progressive Web App (PWA) capabilities, focusing on Web Push Notifications.
 
-## 🛠️ Tech Stack
+## Prerequisites
 
-- **Frontend:** React, Vite, TypeScript, Tailwind CSS, React Router
-- **PWA:** `vite-plugin-pwa` with Workbox
-- **Push Service:** `web-push` library (VAPID)
-- **DevOps:** Docker, Docker Compose
+- Docker
+- Node.js v22.20.0
+- PNPM v10.18.2
 
 ---
 
-## 🚀 Getting Started
+## 🔧 Development
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+### Installation & Configuration
 
-### Prerequisites
-- **Docker** and **Docker Compose**: The project is fully containerized. Please install Docker for your OS.
-- **Node.js** and **PNPM** are **NOT** required on your host machine as they are managed within the Docker container.
-
-### 1. Project Setup
-
-First, clone the repository to your local machine:
+- Create .env file
 
 ```bash
-git clone <your-repository-url>
-cd <your-repository-name>
+cp .env.example .env
 ```
 
-### 2. Environment Configuration
+- Set the following environment variables in `.env`:
 
-The project uses environment variables for configuration.
+```env
+HOST_PORT=8000
+VITE_API_BASE_URL=http://localhost:3000/api
+```
 
-1.  **Copy the example environment file:**
-    ```bash
-    cp .env.example .env
-    ```
+- Available commands
 
-2.  **Update your `.env` file:**
-    Open the `.env` file and fill in the variables.
-
-    ```env
-    # --- Server Configuration ---
-    # Port for the Node.js inside the container
-    PORT=3000
-    
-    # Port to expose the dev server on the host machine
-    HOST_PORT=3000
-    
-    # Base URL for the backend API, accessible from the frontend
-    VITE_API_BASE_URL=http://localhost:3000/api
-    ```
-
-### 3. Running the Application
-
-Everything is managed through Docker Compose.
-
-1.  **Build and Start Services:**
-    This command will build the Docker images and start service in the background.
-    ```bash
-    docker compose up --build -d
-    ```
-
-2.  **Accessing the Services:**
-    -   **PWA Frontend:** Open your browser and navigate to `http://localhost:8000` (or the port you configured for the frontend).
-
-### 4. Stopping the Application
-
-To stop all running containers, use the following command:
 ```bash
-docker compose down
+# Environment status
+./bin/dev.sh
+
+# Start development environment
+./bin/dev.sh up
+
+# Rebuild development environment
+./bin/dev.sh up --build
+
+# View logs
+./bin/dev.sh logs
+
+# Stop all containers
+./bin/dev.sh down
+
+# Stop all containers & remove all images
+./bin/dev.sh remove
+
+# Add new node package
+docker compose run --rm pwa_app pnpm add package-name
+
+# Build & Run preview server
+./bin/dev.sh preview
 ```
 
 ---
 
-## 🔧 Useful Docker Commands
+## 🚀 Production
 
-- **View Logs:**
-  ```bash
-  # View logs for all services
-  docker compose logs -f
+### Installation & Configuration
 
-  # View logs for a specific service (e.g., pwa_app)
-  docker compose logs -f pwa_app
-  ```
+- Create .env file
 
-- **Run One-off Commands:**
-  To run commands inside a container, like installing a new package.
-  ```bash
-  # Example: Install a new package in the frontend
-  docker compose run --rm pwa_app pnpm add package-name
+```bash
+cp .env.example .env.production
+```
 
-- **Access Container Shell:**
-  ```bash
-  docker compose exec pwa_app sh
-  ```
+- Set the following environment variables in `.env.production`:
 
-  ---
+```env
+HOST_PORT=8000
+VITE_API_BASE_URL=https://your-api-domain/api
+```
 
-## 👨‍💻 Development with VS Code Dev Containers
+- Create nginx.conf file
+
+```bash
+cp ./config/nginx/nginx.conf.example ./config/nginx/nginx.conf
+```
+
+- Set production server_name in `nginx.conf`:
+
+```env
+server {
+  ...
+  server_name your-domain.com;
+  ...
+}
+```
+
+- Available commands
+
+```bash
+# Environment status
+./bin/deploy.sh
+
+# Start production
+./bin/deploy.sh up
+
+# View logs
+./bin/deploy.sh logs
+
+# Stop all containers
+./bin/deploy.sh down
+
+# Stop all containers & remove all images
+./bin/deploy.sh remove
+```
+
+---
+
+## 👨‍💻 Development with VS Code Dev Containers (Recommended)
 
 For the best developer experience, this project is configured to use **VS Code Dev Containers**. This allows you to develop inside a fully configured Docker container directly from VS Code.
 
@@ -114,7 +128,3 @@ For the best developer experience, this project is configured to use **VS Code D
 3.  Type **"Reopen in Container"** and select the **`Dev Containers: Reopen in Container`** command.
 4.  VS Code will build the container, install the recommended extensions, and connect your editor to the development environment. This might take a few minutes on the first run.
 5.  Once finished, your VS Code is now running **inside the container**. The integrated terminal (`Ctrl + `` ` ``) is a shell inside the container, ready to go.
-
-### Running the Services in Dev Container
-
-Because the Dev Container is already running, you don't need `docker compose up`. Instead, you can manage services directly from the VS Code terminal.
